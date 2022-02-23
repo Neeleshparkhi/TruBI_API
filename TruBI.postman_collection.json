@@ -1,0 +1,804 @@
+{
+	"info": {
+		"_postman_id": "8c6bc619-e14f-4100-8d5c-ec2101d703da",
+		"name": "TruBI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Autherization_User",
+			"item": [
+				{
+					"name": "TC01_Authenticate_User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var responseValue = pm.response.json();\r",
+									"console.log(responseValue)\r",
+									"pm.environment.set(\"authToken\" , responseValue)\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "System@123",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/api/UsersAPI/AuthenticateUser",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"api",
+								"UsersAPI",
+								"AuthenticateUser"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CreateUserAPI_Validation",
+			"item": [
+				{
+					"name": "Create_Fresh User",
+					"item": [
+						{
+							"name": "TC02_CreateFreshUser",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"//User Name generated\r",
+											"let userName = pm.response.json();\r",
+											"let newUser = userName.replace(\"User \", \"\").replace(\" has been created\",\"\")\r",
+											"pm.environment.set(\"NewUser\" , newUser)\r",
+											"\r",
+											"\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Body matches string\", function () {\r",
+											"    pm.expect(pm.response.text()).to.include(\"has been created\");\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"function generateRandomIntegerInRange(min, max) {\r",
+											"    return Math.floor(Math.random() * (max - min + 1)) + min;\r",
+											"}\r",
+											"\r",
+											"let val = generateRandomIntegerInRange(8000000000, 9000000000);\r",
+											"\r",
+											"pm.environment.set(\"mobileNumber\" , val)\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											"//const val = Math.floor(Math.random().substring(0, 10));\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"UserName\":\"{{$randomUserName}}\",\r\n\"UserfullName\":\"NeeleshParkhi\",\r\n\"Mobileno\":\"{{mobileNumber}}\",\r\n\"EmailID\":\"{{$randomExampleEmail}}\",\r\n\"RoleName\":\"System Admin\",\r\n\"UserPassword\":\"sys@456\",\r\n\"PowerUser\": \"Yes\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseURL}}/api/UsersAPI/CreateUser",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"api",
+										"UsersAPI",
+										"CreateUser"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Create_User Validation",
+					"item": [
+						{
+							"name": "TC03_Create User_Existing UserName",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"UserName\":\"{{NewUser}}\",\r\n\"UserfullName\":\"{{UserfullName}}\",\r\n\"Mobileno\":\"7635293929\",\r\n\"EmailID\":\"{{UserEmailID}}\",\r\n\"RoleName\":\"System Admin\",\r\n\"UserPassword\":\"sys@456\",\r\n\"PowerUser\": \"Yes\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseURL}}/api/UsersAPI/CreateUser",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"api",
+										"UsersAPI",
+										"CreateUser"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TC04_Create User_Existing EmailID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response string comparision\", function () {\r",
+											"    var string = pm.response.json()\r",
+											"pm.expect(string).to.equal(\"Email Id neelesh.parkhi@datamatics.com already exists\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Successful POST request\", function () {\r",
+											"    pm.expect(pm.response.code).to.be.oneOf([400, 401]);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"UserName\":\"{{$randomUserName}}\",\r\n\"UserfullName\":\"NeeleshParkhi\",\r\n\"Mobileno\":\"{{mobileNumber}}\",\r\n\"EmailID\":\"neelesh.parkhi@datamatics.com\",\r\n\"RoleName\":\"System Admin\",\r\n\"UserPassword\":\"sys@456\",\r\n\"PowerUser\": \"Yes\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseURL}}/api/UsersAPI/CreateUser",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"api",
+										"UsersAPI",
+										"CreateUser"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TC05_Create User_Existing Mobile Number",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response string comparision\", function () {\r",
+											"    var string = pm.response.json()\r",
+											"pm.expect(string).to.equal(\"Mobile number already exists.\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Successful POST request\", function () {\r",
+											"    pm.expect(pm.response.code).to.be.oneOf([400, 401]);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"UserName\":\"{{$randomUserName}}\",\r\n\"UserfullName\":\"NeeleshParkhi\",\r\n\"Mobileno\":\"{{mobileNumber}}\",\r\n\"EmailID\":\"{{$randomExampleEmail}}\",\r\n\"RoleName\":\"System Admin\",\r\n\"UserPassword\":\"sys@456\",\r\n\"PowerUser\": \"Yes\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseURL}}/api/UsersAPI/CreateUser",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"api",
+										"UsersAPI",
+										"CreateUser"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Update_User",
+			"item": [
+				{
+					"name": "TC06_Update User_User Full Name update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response string comparision\", function () {\r",
+									"    var string = pm.response.json()\r",
+									"pm.expect(string).to.equal(\"User Neelesh has been updated\")\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"function generateRandomIntegerInRange(min, max) {\r",
+									"    return Math.floor(Math.random() * (max - min + 1)) + min;\r",
+									"}\r",
+									"\r",
+									"let val = generateRandomIntegerInRange(8000000000, 9000000000);\r",
+									"\r",
+									"pm.environment.set(\"mobileNumber\" , val)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"UserName\":\"{{UpdateUser}}\",\r\n\"UserfullName\":\"{{$randomUserName}}\",\r\n\"Mobileno\":\"{{mobileNumber}}\",\r\n\"EmailID\":\"{{$randomExampleEmail}}\",\r\n\"RoleName\":\"System Admin\",\r\n\"UserPassword\":\"sys@456\",\r\n\"PowerUser\": \"Yes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/api/UsersAPI/UpdateUser",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"api",
+								"UsersAPI",
+								"UpdateUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC07_Update User_User Mobile Number update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response string comparision\", function () {\r",
+									"    var string = pm.response.json()\r",
+									"pm.expect(string).to.equal(\"User Neelesh has been updated\")\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"function generateRandomIntegerInRange(min, max) {\r",
+									"    return Math.floor(Math.random() * (max - min + 1)) + min;\r",
+									"}\r",
+									"\r",
+									"let val = generateRandomIntegerInRange(8000000000, 9000000000);\r",
+									"\r",
+									"pm.environment.set(\"mobileNumber\" , val)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"UserName\":\"{{UpdateUser}}\",\r\n\"UserfullName\":\"{{UserfullName}}\",\r\n\"Mobileno\":\"{{UpdatedmobileNumber}}\",\r\n\"EmailID\":\"{{$randomExampleEmail}}\",\r\n\"RoleName\":\"System Admin\",\r\n\"UserPassword\":\"sys@456\",\r\n\"PowerUser\": \"Yes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/api/UsersAPI/UpdateUser",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"api",
+								"UsersAPI",
+								"UpdateUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC08_Update User_User Email ID update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response string comparision\", function () {\r",
+									"    var string = pm.response.json()\r",
+									"pm.expect(string).to.equal(\"User Neelesh has been updated\")\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});\r",
+									"\r",
+									"//User Name generated\r",
+									"// let userName = pm.response.json();\r",
+									"// let newUser = userName.replace(\"User \", \"\").replace(\" has been created\",\"\")\r",
+									"// pm.environment.set(\"NewUser\" , newUser)\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"function generateRandomIntegerInRange(min, max) {\r",
+									"    return Math.floor(Math.random() * (max - min + 1)) + min;\r",
+									"}\r",
+									"\r",
+									"let val = generateRandomIntegerInRange(8000000000, 9000000000);\r",
+									"\r",
+									"pm.environment.set(\"mobileNumber\" , val)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"UserName\":\"{{UpdateUser}}\",\r\n\"UserfullName\":\"{{UserfullName}}\",\r\n\"Mobileno\":\"{{mobileNumber}}\",\r\n\"EmailID\":\"{{$randomExampleEmail}}\",\r\n\"RoleName\":\"System Admin\",\r\n\"UserPassword\":\"sys@456\",\r\n\"PowerUser\": \"Yes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/api/UsersAPI/UpdateUser",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"api",
+								"UsersAPI",
+								"UpdateUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC09_Update User_User RoleName update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response string comparision\", function () {\r",
+									"    var string = pm.response.json()\r",
+									"pm.expect(string).to.equal(\"User Neelesh has been updated\")\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});\r",
+									"\r",
+									"//User Name generated\r",
+									"// let userName = pm.response.json();\r",
+									"// let newUser = userName.replace(\"User \", \"\").replace(\" has been created\",\"\")\r",
+									"// pm.environment.set(\"NewUser\" , newUser)\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"function generateRandomIntegerInRange(min, max) {\r",
+									"    return Math.floor(Math.random() * (max - min + 1)) + min;\r",
+									"}\r",
+									"\r",
+									"let val = generateRandomIntegerInRange(8000000000, 9000000000);\r",
+									"\r",
+									"pm.environment.set(\"mobileNumber\" , val)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"UserName\":\"{{UpdateUser}}\",\r\n\"UserfullName\":\"{{UserfullName}}\",\r\n\"Mobileno\":\"{{mobileNumber}}\",\r\n\"EmailID\":\"{{$randomExampleEmail}}\",\r\n\"RoleName\":\"Business User\",\r\n\"UserPassword\":\"sys@456\",\r\n\"PowerUser\": \"Yes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/api/UsersAPI/UpdateUser",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"api",
+								"UsersAPI",
+								"UpdateUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC10_Update User_User Not exist update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response string comparision\", function () {\r",
+									"    var string = pm.response.json()\r",
+									"pm.expect(string).to.equal(\"User UserNotExist does not exist\")\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([400, 404]);\r",
+									"});\r",
+									"\r",
+									"//User Name generated\r",
+									"// let userName = pm.response.json();\r",
+									"// let newUser = userName.replace(\"User \", \"\").replace(\" has been created\",\"\")\r",
+									"// pm.environment.set(\"NewUser\" , newUser)\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"function generateRandomIntegerInRange(min, max) {\r",
+									"    return Math.floor(Math.random() * (max - min + 1)) + min;\r",
+									"}\r",
+									"\r",
+									"let val = generateRandomIntegerInRange(8000000000, 9000000000);\r",
+									"\r",
+									"pm.environment.set(\"mobileNumber\" , val)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"UserName\":\"UserNotExist\",\r\n\"UserfullName\":\"{{UserfullName}}\",\r\n\"Mobileno\":\"{{mobileNumber}}\",\r\n\"EmailID\":\"{{$randomExampleEmail}}\",\r\n\"RoleName\":\"Business User\",\r\n\"UserPassword\":\"sys@456\",\r\n\"PowerUser\": \"Yes\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/api/UsersAPI/UpdateUser",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"api",
+								"UsersAPI",
+								"UpdateUser"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Test",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"UserName\":\"VinodWanjari\",\r\n    \"UserfullName\":\"VinodWanjaritest\",\r\n    \"Mobileno\":\"7894561239\",\r\n    \"EmailID\":\"VinodsWsw@gmail.com\",\r\n    \"RoleName\":\"System Admin\",\r\n    \"PowerUser\":\"No\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/api/UsersAPI/UpdateUser",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"api",
+								"UsersAPI",
+								"UpdateUser"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Delete_User",
+			"item": [
+				{
+					"name": "TC11_Delete User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"UserName\":\"{{NewUser}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/UsersAPI/DeleteUser",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"UsersAPI",
+								"DeleteUser"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
