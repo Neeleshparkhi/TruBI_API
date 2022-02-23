@@ -332,7 +332,7 @@
 			]
 		},
 		{
-			"name": "Update_User",
+			"name": "Update_User Validation",
 			"item": [
 				{
 					"name": "TC06_Update User_User Full Name update",
@@ -763,6 +763,21 @@
 			"item": [
 				{
 					"name": "TC11_Delete User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -774,11 +789,11 @@
 								}
 							]
 						},
-						"method": "PUT",
+						"method": "DELETE",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\"UserName\":\"{{NewUser}}\"\r\n}",
+							"raw": "{\r\n    \"UserName\":\"{{NewUser}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -786,13 +801,182 @@
 							}
 						},
 						"url": {
-							"raw": "{{BaseURL}}/UsersAPI/DeleteUser",
+							"raw": "{{BaseURL}}/api/UsersAPI/DeleteUser",
 							"host": [
 								"{{BaseURL}}"
 							],
 							"path": [
+								"api",
 								"UsersAPI",
 								"DeleteUser"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Activate User",
+			"item": [
+				{
+					"name": "Activate User_Validation",
+					"item": [
+						{
+							"name": "TC13_Activate User_User Name not exist",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response string comparision\", function () {\r",
+											"    var string = pm.response.json()\r",
+											"    pm.expect(string).to.equal(\"User TestInvalid does not exist\")\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"UserName\":\"TestInvalid\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseURL}}/api/UsersAPI/ActivateUser",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"api",
+										"UsersAPI",
+										"ActivateUser"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TC14_Activate User_User is Active already",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response string comparision\", function () {\r",
+											"   var response = pm.response.json()\r",
+											"    pm.expect(response).to.include(\"is already active\")\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"UserName\":\"{{NewUser}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseURL}}/api/UsersAPI/ActivateUser",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"api",
+										"UsersAPI",
+										"ActivateUser"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "TC12_Activate User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response string comparision\", function () {\r",
+									"   var response = pm.response.json()\r",
+									"    pm.expect(response).to.include(\"activated successfully\")\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"UserName\":\"{{NewUser}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseURL}}/api/UsersAPI/ActivateUser",
+							"host": [
+								"{{BaseURL}}"
+							],
+							"path": [
+								"api",
+								"UsersAPI",
+								"ActivateUser"
 							]
 						}
 					},
